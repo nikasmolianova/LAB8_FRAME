@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth scroll-pt-[7.5rem] md:scroll-pt-[5.5rem]">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- початковий масштаб сторінки (100%) -->
+<meta name="description" content="Nicole Frame — портретна та комерційна фотографія. Застигла естетика вашого моменту, прозорий калькулятор вартості та зручне бронювання.">
+<title>Nicole Frame — Портретна та комерційна фотографія</title>
+
+<!-- ============================================================
+     МЕДІАІНТЕГРАЦІЯ №1: ШРИФТИ ТА ІКОНКИ (зовнішні ресурси)
+     - Google Fonts: Playfair Display (заголовки) + Inter (основний текст)
+     - Font Awesome 6.6.0 (іконки в калькуляторі, футері) через cdnjs
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<!-- ===================== КІНЕЦЬ МЕДІАБЛОКУ №1 ===================== -->
+<script src="assets/js/validation.js" defer></script>
+<!-- Tailwind CSS через CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        screens: { sm: '600px', md: '900px' },
+        colors: {
+          primary: '#722138',
+          'primary-hover': '#5C1A2D',
+          secondary: '#2F6A94',
+          'secondary-bg': '#E6F1FA',
+          accent: '#A4532F',
+          cream: '#FBF8F5',
+          'surface-alt': '#F5F1EC',
+          ink: '#2A1210',
+          muted: '#6B5A55',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          heading: ['"Playfair Display"', 'Georgia', 'serif'],
+        },
+        opacity: { 85: '0.85' },
+        fontSize: {
+          'fs-xs': 'clamp(0.8rem, 1.5vw, 0.9rem)',
+          'fs-sm': 'clamp(0.875rem, 1.8vw, 1rem)',
+          'fs-md': 'clamp(0.95rem, 2vw, 1.1rem)',
+          'fs-base': 'clamp(1rem, 2.2vw, 1.2rem)',
+          'fs-lg': 'clamp(1.1rem, 2.5vw, 1.3rem)',
+          'fs-xl': 'clamp(1.25rem, 3vw, 1.5rem)',
+          'fs-2xl': 'clamp(1.4rem, 3.5vw, 2rem)',
+          'fs-3xl': 'clamp(1.75rem, 4.5vw, 2.5rem)',
+        },
+      },
+    },
+  };
+</script>
+
+<style type="text/tailwindcss">
+  :root {
+    --gutter: clamp(16px, 2.9vw, 90px);
+
+    /* Змінні для медіаконтейнерів (відео та карта) */
+    --video-max-width: 960px;
+    --video-radius: 0px;
+    --map-max-width: 960px;
+    --map-height: 450px;
+    --map-radius: 0px;
+    --map-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* ============================================================
+     МЕДІАІНТЕГРАЦІЯ: СТИЛІ ДЛЯ iframe-КОНТЕЙНЕРІВ (відео / карта)
+     Універсальний адаптивний контейнер (принцип DRY)
+     ============================================================ */
+  .media-container {
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--map-radius);
+    box-shadow: var(--map-shadow);
+    background-color: #f5f1ec;
+  }
+  .media-container iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  /* Відеоплеєр (працює на всіх розмірах екрана) */
+  .video { max-width: var(--video-max-width); margin-inline: auto; width: 100%; }
+  .video-caption { margin-top: 0.75rem; color: #6B5A55; }
+  /* ===================== КІНЕЦЬ СТИЛІВ МЕДІА ===================== */
+
+  @layer base {
+    /* На мобільних (до 600px) фіксуємо 16px, щоб не роздувало шрифти в rem */
+    html { font-size: 16px; }
+    @media (min-width: 900px) { /* медіа-запит для екранів від 900px */
+      html { font-size: clamp(11px, 0.85vw, 16px); }
+    }
+
+    body { @apply min-h-screen bg-cream font-sans leading-[1.6] text-ink antialiased; text-rendering: optimizeLegibility; }
+    h1, h2, h3, h4, h5, h6 { @apply font-heading font-semibold leading-[1.1]; }
+    :focus-visible { @apply outline outline-2 outline-offset-2 outline-secondary; } /* підсвічування при навігації клавіатурою */
+    select { /* стилі для випадаючих списків */
+      @apply appearance-none pr-11 cursor-pointer; /* прибирає системну стрілочку */
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23722138' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 1rem center;
+    }
+    /* Вимикає анімації для користувачів із режимом зменшення руху */
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+  }
+
+  @layer components {
+    /* Безпечний контейнер для всіх екранів */
+    .wrap { width: 100%; max-width: 2400px; padding-inline: 1rem; margin-inline: auto; }
+    @media (min-width: 600px) {
+      .wrap { padding-inline: var(--gutter); }
+    }
+
+    .btn { @apply inline-flex items-center justify-center gap-2 border border-transparent px-[1.85rem] py-[0.85rem] text-fs-md font-medium leading-[1.3] whitespace-nowrap transition duration-300; }
+    .btn-primary { @apply bg-primary border-primary text-white hover:bg-primary-hover hover:border-primary-hover; }
+    .btn-secondary { @apply bg-white border-2 border-white text-primary hover:bg-transparent hover:text-white; }
+    .btn-outline { @apply bg-white border-primary text-primary hover:bg-primary hover:text-white; }
+    .tab { @apply border border-primary font-medium text-primary transition duration-300 hover:bg-secondary-bg aria-pressed:bg-primary aria-pressed:text-white aria-pressed:hover:bg-primary; }
+
+    .sec { @apply border-b border-primary py-12 md:py-20; }
+    .section-title { @apply mb-2 text-2xl sm:text-3xl md:text-[3.25rem]; }
+    .section-desc { @apply mb-8 max-w-[78ch] text-fs-base text-muted; }
+    /* поля вводу: білий фон, бордова рамка, підсвічування при фокусі */
+    .field { @apply min-h-[3.4rem] w-full rounded-none border border-primary bg-white px-4 py-[0.7rem] text-fs-base transition duration-300 placeholder:text-muted focus:ring-2 focus:ring-primary; }
+    .form-group { @apply mb-5 flex flex-col gap-[0.6rem]; }
+    .form-group label, legend { @apply text-fs-md font-medium; }
+
+    .nav-link { @apply whitespace-nowrap font-medium text-primary transition duration-300 hover:text-secondary; }
+    .sub-link { @apply block px-5 py-2 text-[1.45rem] transition duration-300 hover:bg-secondary-bg hover:text-primary; }
+    .step { @apply flex flex-col border-t-2 border-primary pt-4; }
+    .step-num { @apply mb-3 font-heading text-fs-3xl font-medium leading-none text-primary; }
+    .card-lift { @apply transition duration-300 hover:-translate-y-1 hover:shadow-lg; }
+    .addon { @apply flex cursor-pointer items-center gap-4 border border-primary bg-white px-[1.1rem] py-4 transition duration-300 has-[:checked]:bg-secondary-bg; }
+    .addon-price { @apply whitespace-nowrap font-heading text-[1.4rem] font-semibold text-primary; }
+    .faq-q { @apply flex cursor-pointer list-none items-center justify-between gap-6 py-[1.6rem] text-fs-lg font-semibold transition duration-300 hover:text-primary [&::-webkit-details-marker]:hidden; }
+    .faq-a { @apply pb-[1.6rem] pr-8 text-fs-base leading-[1.65] opacity-85; }
+    .icon-btn { @apply grid place-items-center border border-primary bg-white text-primary transition duration-300 hover:bg-primary hover:text-white; }
+    .footer-link { @apply opacity-85 transition-all duration-300 hover:pl-1 hover:text-primary hover:opacity-100; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ШАПКА -->
+<header class="sticky top-0 z-[100] w-full border-b border-ink/10 bg-surface-alt">
+  <div class="wrap flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 md:min-h-[5.5rem] md:py-0">
+    <div class="logo">
+      <a href="index.html" aria-label="Nicole Frame — на головну" class="block transition duration-300 hover:opacity-80">
+        <!-- МЕДІА: логотип (SVG, локальний файл) -->
+        <img src="assets/icons/logo.svg" alt="Nicole Frame" class="h-12 md:h-[4.9rem] w-auto">
+      </a>
+    </div>
+
+    <nav aria-label="Основна навігація" class="order-3 w-full md:order-none md:w-auto">
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm md:text-base min-[1100px]:gap-x-6 min-[1350px]:gap-x-[3.8rem] min-[1350px]:text-[1.57rem]">
+        <li class="group relative">
+          <a href="#portfolio" class="nav-link inline-flex items-center gap-2">Портфоліо
+            <span aria-hidden="true" class="hidden h-[6px] w-[6px] rotate-45 border-b-2 border-r-2 border-current transition duration-300 md:inline-block md:group-hover:-rotate-[135deg] md:group-focus-within:-rotate-[135deg]"></span>
+          </a>
+          <ul class="absolute left-0 top-full z-[200] hidden min-w-56 border border-primary bg-white py-3 shadow-lg md:group-hover:block md:group-focus-within:block">
+            <li><a class="sub-link" href="#portfolio">Портрет</a></li>
+            <li><a class="sub-link" href="#portfolio">Родина</a></li>
+            <li><a class="sub-link" href="#portfolio">Історія кохання</a></li>
+            <li><a class="sub-link" href="#portfolio">Весілля</a></li>
+            <li><a class="sub-link" href="#portfolio">Комерція</a></li>
+          </ul>
+        </li>
+        <li class="group relative">
+          <a href="#process" class="nav-link inline-flex items-center gap-2">Послуги
+            <span aria-hidden="true" class="hidden h-[6px] w-[6px] rotate-45 border-b-2 border-r-2 border-current transition duration-300 md:inline-block md:group-hover:-rotate-[135deg] md:group-focus-within:-rotate-[135deg]"></span>
+          </a>
+          <ul class="absolute left-0 top-full z-[200] hidden min-w-56 border border-primary bg-white py-3 shadow-lg md:group-hover:block md:group-focus-within:block">
+            <li><a class="sub-link" href="#calculator">Особиста зйомка</a></li>
+            <li><a class="sub-link" href="#calculator">Комерційна зйомка</a></li>
+          </ul>
+        </li>
+        <li><a href="#about" class="nav-link">Про мене</a></li>
+        <li><a href="#" class="nav-link">Блог</a></li>
+        <li><a href="#contacts" class="nav-link">Контакти</a></li>
+      </ul>
+    </nav>
+
+    <div class="flex shrink-0 items-center">
+      <a href="#calculator" class="btn btn-primary text-xs md:text-[1.4rem]">Дізнатися вартість</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <!-- МЕДІА: фонове зображення hero (локальний файл assets/images/hero-bg.jpg) + затемнювальний градієнт -->
+  <section aria-labelledby="hero-title" class="relative flex w-full items-center bg-[#7f9db0] bg-[url('assets/images/hero-bg.jpg')] bg-cover bg-center py-12 text-white md:min-h-[calc(100vh-5.5rem)] md:py-0">
+    <div class="absolute inset-0 bg-gradient-to-r from-[#1f3446]/80 to-[#1f3446]/40" aria-hidden="true"></div>
+    <div class="wrap relative">
+      <div class="max-w-[68rem] py-6 md:py-12">
+        <p class="mb-3 text-sm md:text-[1.15rem] font-medium uppercase tracking-[0.1em]">Портретна та комерційна фотографія</p>
+        <h1 id="hero-title" class="mb-4 text-2xl sm:text-4xl md:text-[clamp(3.95rem,5.6vw,5.75rem)] leading-tight md:leading-[1.08]">Мистецтво бачити важливе. Застигла естетика вашого моменту</h1>
+        <p class="mb-8 max-w-[46rem] text-base md:text-[1.6rem] leading-relaxed md:leading-[1.55]">Nicole Frame — це простір, де фотографія домінує над зайвим шумом. Досконалий колір, глибока атмосфера та бездоганний сервіс від першого кліка.</p>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 md:gap-[3.95rem]">
+          <a href="#calculator" class="btn btn-primary border-[3px] px-6 md:px-10 py-3 md:py-[1.1rem] text-base md:text-[1.4rem]">Розрахувати вартість</a>
+          <a href="#portfolio" class="btn btn-secondary border-[3px] px-6 md:px-10 py-3 md:py-[1.1rem] text-base md:text-[1.4rem]">Переглянути портфоліо</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ПРО МЕНЕ -->
+  <section id="about" aria-labelledby="about-title" class="sec bg-cream">
+    <div class="wrap grid items-center gap-8 md:grid-cols-2 md:gap-16">
+      <div>
+        <!-- МЕДІА: фото фотографа (lazy-завантаження) -->
+        <img src="assets/images/photographer.jpg" alt="Ніколь — фотограф" loading="lazy" class="h-full max-h-[580px] w-full rounded object-cover">
+      </div>
+      <div class="flex flex-col">
+        <p class="mb-2 text-fs-xs font-semibold uppercase tracking-[0.15em] text-accent">Про мене</p>
+        <h2 id="about-title" class="mb-4 md:mb-6 text-2xl md:text-[2.75rem] font-medium leading-[1.15]">Привіт, я Ніколь</h2>
+        <blockquote class="mb-6 border-b border-primary/15 pb-5 font-heading text-lg md:text-[1.45rem] leading-[1.45] text-primary">
+          «Фотографія — це спосіб затамувати подих і зупинити час там, де слова вже безсилі.»
+        </blockquote>
+        <div class="[&>p]:mb-4 [&>p]:text-sm md:[&>p]:text-fs-md [&>p]:leading-relaxed [&>p]:opacity-90">
+          <p>Я вірю, що найкращі кадри народжуються в моментах, коли ви забуваєте про камеру. Сплануємо вашу зйомку з урахуванням цілей, локації та вашого унікального стилю.</p>
+          <p>Мій досвід — це понад 3 роки зйомок, де головне — світло, погляд і щирі емоції. Прагну, щоб кожен кадр дарував відчуття краси та впевненості.</p>
+        </div>
+        <div class="mt-2"><a href="#portfolio" class="btn btn-primary">Дізнатися більше</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ПОРТФОЛІО -->
+  <section id="portfolio" aria-labelledby="portfolio-title" class="sec bg-surface-alt">
+    <div class="wrap">
+      <h2 id="portfolio-title" class="section-title">Портфоліо</h2>
+      <p class="section-desc pt-4">Знайдіть історію, яка нагадує вашу, або натхнення для наступної миті</p>
+
+      <div role="group" aria-label="Фільтри портфоліо" class="mb-8 flex flex-wrap gap-2 md:gap-3">
+        <button type="button" class="tab px-4 md:px-6 py-2 md:py-[0.7rem] text-sm md:text-fs-md" aria-pressed="true">Усі</button>
+        <button type="button" class="tab px-4 md:px-6 py-2 md:py-[0.7rem] text-sm md:text-fs-md" aria-pressed="false">Портрет</button>
+        <button type="button" class="tab px-4 md:px-6 py-2 md:py-[0.7rem] text-sm md:text-fs-md" aria-pressed="false">Родина</button>
+        <button type="button" class="tab px-4 md:px-6 py-2 md:py-[0.7rem] text-sm md:text-fs-md" aria-pressed="false">Історія кохання</button>
+        <button type="button" class="tab px-4 md:px-6 py-2 md:py-[0.7rem] text-sm md:text-fs-md" aria-pressed="false">Весілля</button>
+        <button type="button" class="tab px-4 md:px-6 py-2 md:py-[0.7rem] text-sm md:text-fs-md" aria-pressed="false">Комерція</button>
+      </div>
+
+      <!-- ============================================================
+           МЕДІАІНТЕГРАЦІЯ: ГАЛЕРЕЯ ПОРТФОЛІО (6 зображень, lazy-завантаження,
+           співвідношення сторін 7:4, ефект збільшення при наведенні)
+           ============================================================ -->
+      <div class="mb-8 grid gap-x-5 gap-y-7 sm:grid-cols-2 md:grid-cols-3">
+        <article class="group flex cursor-pointer flex-col">
+          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-1.jpg" alt="Особиста історія" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
+          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Особиста історія</h3>
+          <p class="text-sm md:text-fs-md text-primary">Портрет</p>
+        </article>
+        <article class="group flex cursor-pointer flex-col">
+          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-2.jpg" alt="Разом вдома" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
+          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Разом вдома</h3>
+          <p class="text-sm md:text-fs-md text-primary">Родина</p>
+        </article>
+        <article class="group flex cursor-pointer flex-col">
+          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-3.jpg" alt="Прогулянка вдвох" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
+          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Прогулянка вдвох</h3>
+          <p class="text-sm md:text-fs-md text-primary">Історія кохання</p>
+        </article>
+        <article class="group flex cursor-pointer flex-col">
+          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-4.jpg" alt="Весільна зйомка" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
+          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">День, коли ви кажете «так»</h3>
+          <p class="text-sm md:text-fs-md text-primary">Весілля</p>
+        </article>
+        <article class="group flex cursor-pointer flex-col">
+          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-5.jpg" alt="Комерційна зйомка" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
+          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Люди за брендом</h3>
+          <p class="text-sm md:text-fs-md text-primary">Комерція</p>
+        </article>
+        <article class="group flex cursor-pointer flex-col">
+          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-6.jpg" alt="Портретна зйомка" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
+          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Момент тільки для вас</h3>
+          <p class="text-sm md:text-fs-md text-primary">Портрет</p>
+        </article>
+      </div>
+      <!-- ===================== КІНЕЦЬ ГАЛЕРЕЇ ПОРТФОЛІО ===================== -->
+
+      <div class="flex justify-center"><a href="#" class="btn btn-primary">Переглянути всі роботи</a></div>
+    </div>
+  </section>
+
+  <!-- ЯК ЦЕ ПРАЦЮЄ + ПЕРЕВАГИ -->
+  <section id="process" aria-labelledby="process-title" class="sec bg-cream">
+    <div class="wrap">
+      <div class="mb-8 md:mb-12">
+        <h2 id="process-title" class="section-title mb-3">Як це працює</h2>
+        <p class="section-desc max-w-none text-ink opacity-85 pt-3">Комфортний та прозорий процес на кожному етапі — від першої ідеї до готової галереї.</p>
+      </div>
+
+      <ol aria-label="Етапи роботи" class="mb-12 md:mb-[4.5rem] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+        <li class="step">
+          <span class="step-num">01</span>
+          <h3 class="mb-1 font-sans text-lg md:text-fs-xl">Консультація та розрахунок</h3>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Обираєте формат у калькуляторі, узгоджуємо дату, ідею та підписуємо договір.</p>
+        </li>
+        <li class="step">
+          <span class="step-num">02</span>
+          <h3 class="mb-1 font-sans text-lg md:text-fs-xl">Підготовка та концепція</h3>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Формуємо мудборд, допомагаю обрати студію, локацію та ідеальні образи.</p>
+        </li>
+        <li class="step">
+          <span class="step-num">03</span>
+          <h3 class="mb-1 font-sans text-lg md:text-fs-xl">Зйомка без стресу</h3>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Легка атмосфера в кадрі. Вам не потрібно вміти позувати — я повністю вас направлю.</p>
+        </li>
+        <li class="step">
+          <span class="step-num">04</span>
+          <h3 class="mb-1 font-sans text-lg md:text-fs-xl">Готова галерея</h3>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Перші фото через 48 годин. Повна онлайн-галерея у визначений термін.</p>
+        </li>
+      </ol>
+
+      <div class="mb-6 md:mb-8"><h3 class="text-xl md:text-fs-3xl">Чому обирають Nicole Frame</h3></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        <article class="card-lift rounded border border-primary/10 bg-white p-6 md:px-7 md:py-8 shadow-sm">
+          <h4 class="mb-2 text-lg md:text-[1.6rem] font-medium text-primary">Прозора ціна</h4>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Ви бачите точний розрахунок вартості ще до початку бронювання без «цін у дірект».</p>
+        </article>
+        <article class="card-lift rounded border border-primary/10 bg-white p-6 md:px-7 md:py-8 shadow-sm">
+          <h4 class="mb-2 text-lg md:text-[1.6rem] font-medium text-primary">Авторський колір</h4>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Природний скінтон, глибокі естетичні відтінки та ретуш без втрати текстури шкіри.</p>
+        </article>
+        <article class="card-lift rounded border border-primary/10 bg-white p-6 md:px-7 md:py-8 shadow-sm">
+          <h4 class="mb-2 text-lg md:text-[1.6rem] font-medium text-primary">Персональний підхід</h4>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Кожна зйомка розробляється індивідуально під ваші цілі або комерційний бриф.</p>
+        </article>
+        <article class="card-lift rounded border border-primary/10 bg-white p-6 md:px-7 md:py-8 shadow-sm">
+          <h4 class="mb-2 text-lg md:text-[1.6rem] font-medium text-primary">Швидка віддача</h4>
+          <p class="text-sm md:text-base leading-relaxed opacity-90">Анонс перших серійних кадрів уже протягом 48 годин після завершення зйомки.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- КАЛЬКУЛЯТОР -->
+<section id="calculator" aria-labelledby="calc-title" class="sec bg-surface-alt">
+  <div class="wrap">
+    <h2 id="calc-title" class="section-title">Розрахуйте вартість зйомки</h2>
+    <p class="section-desc mb-3 pt-4">Виберіть сесію та додаткові послуги. Надішліть заявку, щоб обговорити доступність — тут не відбувається оплата.</p>
+
+    <div class="grid items-start gap-x-10 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] md:grid-rows-[auto_1fr]">
+      <div role="group" aria-label="Перемикач типу послуги" class="grid grid-cols-1 sm:grid-cols-2 md:col-start-1">
+        <button type="button" class="tab bg-white px-4 py-3 md:py-[1.1rem] text-sm md:text-fs-base" aria-pressed="true">Особиста зйомка · B2C</button>
+        <button type="button" class="tab bg-white px-4 py-3 md:py-[1.1rem] text-sm md:text-fs-base -mt-px sm:mt-0 sm:-ml-px" aria-pressed="false">Комерційна зйомка · B2B</button>
+      </div>
+
+      <div class="contents">
+        <form class="mt-6 md:mt-8 md:col-start-1 md:row-start-2">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="form-group">
+              <label for="shooting-type">Тип зйомки</label>
+              <select id="shooting-type" name="type" class="field">
+                <option value="portrait">Портрет</option>
+                <option value="family">Родина</option>
+                <option value="love-story">Історія кохання</option>
+                <option value="wedding">Весілля</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="shooting-duration">Тривалість</label>
+              <select id="shooting-duration" name="duration" class="field">
+                <option value="1">1 година — 3 000&nbsp;₴</option>
+                <option value="2">2 години — 5 000&nbsp;₴</option>
+                <option value="3">3 години — 7 000&nbsp;₴</option>
+              </select>
+            </div>
+          </div>
+
+          <p class="mb-6 md:mb-8 mt-1 text-xs md:text-fs-md text-muted">Особисте: портрет, сімейна, любовна історія, весілля. Комерційне: бренд, продукт або командна фотографія.</p>
+
+          <fieldset class="flex flex-col gap-3 md:gap-[0.85rem] border-0">
+            <legend class="mb-2">Додатки</legend>
+            <label class="addon">
+              <input type="checkbox" name="addons" value="retouch" class="size-5 md:size-[1.4rem] shrink-0 accent-primary">
+              <span class="flex-1 text-xs md:text-fs-base">Додаткове ретушування · 5 зображень</span>
+              <span class="addon-price">+ 800&nbsp;₴</span>
+            </label>
+            <label class="addon">
+              <input type="checkbox" name="addons" value="urgent" class="size-5 md:size-[1.4rem] shrink-0 accent-primary">
+              <span class="flex-1 text-xs md:text-fs-base">Термінова обробка · 24–48 годин</span>
+              <span class="addon-price">+ 1 000&nbsp;₴</span>
+            </label>
+            <label class="addon">
+              <input type="checkbox" name="addons" value="second" class="size-5 md:size-[1.4rem] shrink-0 accent-primary">
+              <span class="flex-1 text-xs md:text-fs-base">Другий фотограф</span>
+              <span class="addon-price">+ 2 000&nbsp;₴</span>
+            </label>
+            <label class="addon">
+              <input type="checkbox" name="addons" value="studio" class="size-5 md:size-[1.4rem] shrink-0 accent-primary">
+              <span class="flex-1 text-xs md:text-fs-base">Бронювання студії</span>
+              <span class="addon-price">+ 1 500&nbsp;₴</span>
+            </label>
+            <label class="addon">
+              <input type="checkbox" name="addons" value="location" class="size-5 md:size-[1.4rem] shrink-0 accent-primary">
+              <span class="flex-1 text-xs md:text-fs-base">Додаткова локація</span>
+              <span class="addon-price">+ 600&nbsp;₴</span>
+            </label>
+          </fieldset>
+
+          <p class="mt-6 md:mt-8 text-xs md:text-fs-md text-muted">Для комерційних проєктів права використання та вимоги до виробництва перевіряються з вашим брифом перед остаточним розрахунком.</p>
+        </form>
+
+        <div aria-live="polite" class="mt-8 border border-primary bg-white p-5 sm:p-8 md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0">
+          <h3 class="mb-4 md:mb-6 text-xl md:text-[2.2rem]">Ваш розрахунок</h3>
+
+          <ul class="flex flex-col gap-3 md:gap-4 border-b border-primary pb-4 md:pb-6 text-sm md:text-fs-base">
+            <li class="flex items-baseline justify-between gap-4"><span>Портрет · 1 година</span> <span class="font-heading font-semibold">3 000&nbsp;₴</span></li>
+            <li class="flex items-baseline justify-between gap-4 text-muted"><span>Додатки</span> <span>не обрано</span></li>
+          </ul>
+
+          <div class="flex items-baseline justify-between gap-4 pb-4 pt-4 md:pt-5">
+            <span class="text-sm md:text-fs-base font-semibold">Орієнтовна сума</span>
+            <span class="font-heading text-xl md:text-[2.4rem] font-semibold text-primary">від 3 000&nbsp;₴</span>
+          </div>
+
+          <div class="mb-6 border-b border-primary pb-6">
+            <h4 class="mb-3 md:mb-4 font-sans text-sm md:text-fs-md font-semibold">У вартість входить</h4>
+            <ul class="flex flex-col gap-2 md:gap-[0.7rem] text-xs md:text-fs-md leading-relaxed">
+              <li class="flex items-center gap-2">✓ <span>Зйомка обраної тривалості</span></li>
+              <li class="flex items-center gap-2">✓ <span>[кількість] оброблених фото</span></li>
+              <li class="flex items-center gap-2">✓ <span>[формат передачі: онлайн-галерея]</span></li>
+              <li class="flex items-center gap-2">✓ <span>Термін здачі: [кількість] днів</span></li>
+            </ul>
+          </div>
+
+          <p class="mb-6 text-xs text-muted">Остаточна ціна та доступність підтверджуються особисто. Для закріплення дати потрібен депозит 30%.</p>
+
+       <form id="lead-form" class="flex flex-col gap-4" novalidate>
+            <div class="form-group">
+              <label for="user-name" class="text-sm font-semibold">Ваше ім'я</label>
+              <input type="text" id="user-name" name="name" placeholder="Повне ім'я" required class="field">
+            </div>
+
+            <div class="form-group">
+              <label for="user-email" class="text-sm font-semibold">Електронна пошта</label>
+              <input type="email" id="user-email" name="email" placeholder="you@example.com" required class="field">
+            </div>
+
+            <div class="form-group">
+              <label for="user-phone" class="text-sm font-semibold">Номер телефону</label>
+              <input type="tel" id="user-phone" name="phone" placeholder="+380 (__) ___-__-__" required class="field">
+            </div>
+
+            <div class="form-group">
+              <label for="user-date" class="text-sm font-semibold">Бажана дата (необов'язково)</label>
+              <input type="date" id="user-date" name="date" class="field">
+            </div>
+
+            <button type="submit" class="mt-2 w-full bg-primary text-white py-3 px-6 text-sm md:text-fs-base font-semibold hover:opacity-90 transition-opacity">Надіслати заявку</button>
+          </form>
+
+          <p class="mt-4 text-xs text-muted text-center">Надсилаючи заявку, ви погоджуєтеся з Політикою конфіденційності. Це запит, а не підтверджене бронювання.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+  <!-- FAQ -->
+  <section id="faq" aria-labelledby="faq-title" class="sec bg-cream">
+    <div class="wrap grid items-start gap-8 md:grid-cols-[1fr_1.8fr] md:gap-16">
+      <div class="flex flex-col items-start">
+        <h2 id="faq-title" class="section-title mb-4">Корисні відповіді</h2>
+        <p class="section-desc text-sm md:text-fs-lg text-ink opacity-85 pt-3">Ось що найчастіше варто обговорити перед бронюванням зйомки.</p>
+        <div class="flex flex-col items-start gap-3">
+          <p class="text-sm md:text-fs-base font-semibold">Маєте інші запитання або власну ідею?</p>
+          <a href="#contacts" class="btn btn-primary">Напишіть мені</a>
+        </div>
+      </div>
+
+      <div class="border-t border-primary">
+        <details class="group border-b border-primary" open>
+          <summary class="faq-q"><span>Що робити, якщо я / ми не вміємо позувати?</span><span aria-hidden="true" class="text-xl md:text-[2.1rem] leading-none text-primary after:content-['+'] group-open:after:content-['−']"></span></summary>
+          <div class="faq-a"><p>Це абсолютно нормально — більшість моїх клієнтів не є професійними моделями. На зйомці я м'яко спрямовую кожен рух, підказую, куди подіти руки та як почуватися природно.</p></div>
+        </details>
+        <details class="group border-b border-primary">
+          <summary class="faq-q"><span>Чи допомагаєте ви з вибором локації, студії та образів?</span><span aria-hidden="true" class="text-xl md:text-[2.1rem] leading-none text-primary after:content-['+'] group-open:after:content-['−']"></span></summary>
+          <div class="faq-a"><p>Так, це повноцінна частина підготовки. Після обговорення вашої ідеї я надсилаю мудборд із рекомендованими фотостудіями чи вуличними локаціями, а також допомагаю зібрати гармонійні образи.</p></div>
+        </details>
+        <details class="group border-b border-primary">
+          <summary class="faq-q"><span>Коли й у якому вигляді я отримаю готові фотографії?</span><span aria-hidden="true" class="text-xl md:text-[2.1rem] leading-none text-primary after:content-['+'] group-open:after:content-['−']"></span></summary>
+          <div class="faq-a"><p>Анонс (перші 5–10 кадрів у колірнокорекції) ви отримуєте вже протягом 48 годин. Повний сет віддається через зручну персональну онлайн-галерею протягом 10–14 днів.</p></div>
+        </details>
+        <details class="group border-b border-primary">
+          <summary class="faq-q"><span>Як відбувається бронювання та чи потрібна передоплата?</span><span aria-hidden="true" class="text-xl md:text-[2.1rem] leading-none text-primary after:content-['+'] group-open:after:content-['−']"></span></summary>
+          <div class="faq-a"><p>Дата та час фіксуються за вами після внесення депозиту 30% та короткого узгодження деталей. Остаточний розрахунок відбувається в день зйомки.</p></div>
+        </details>
+        <details class="group border-b border-primary">
+          <summary class="faq-q"><span>Чи входить орендована студія або візажист у вартість?</span><span aria-hidden="true" class="text-xl md:text-[2.1rem] leading-none text-primary after:content-['+'] group-open:after:content-['−']"></span></summary>
+          <div class="faq-a"><p>Оренда фотостудії та послуги б'юті-майстрів сплачуються окремо. У калькуляторі на сайті ви можете відмітити ці опції, і я допоможу з їх організацією.</p></div>
+        </details>
+        <details class="group border-b border-primary">
+          <summary class="faq-q"><span>Що робити, якщо змінилися плани чи зіпсувалася погода?</span><span aria-hidden="true" class="text-xl md:text-[2.1rem] leading-none text-primary after:content-['+'] group-open:after:content-['−']"></span></summary>
+          <div class="faq-a"><p>Ми можемо безоплатно перенести зйомку на іншу вільну дату за умови попередження за 2–3 дні (залежно від правил скасування оренди обраної студії).</p></div>
+        </details>
+        <details class="group border-b border-primary">
+          <summary class="faq-q"><span>Чи віддаєте ви початкові RAW-файли (необроблені фото)?</span><span aria-hidden="true" class="text-xl md:text-[2.1rem] leading-none text-primary after:content-['+'] group-open:after:content-['−']"></span></summary>
+          <div class="faq-a"><p>Початкові RAW-матеріали є робочим ресурсом. Ви отримуєте повністю відбракований, авторсько оброблений та готовий результат у максимальній якості.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       МЕДІАІНТЕГРАЦІЯ №2: ВІДЕО (YouTube, iframe)
+       - Адаптивне співвідношення сторін 16:9 (aspect-video)
+       - Відео вбудоване через youtube.com/embed (ID: gG142GTvqis)
+       - loading="lazy" — відкладене завантаження
+       - Доступність: title + aria-label, підпис <figcaption>
+       - Безпека: referrerpolicy="strict-origin-when-cross-origin"
+       ============================================================ -->
+  <section class="py-8 md:py-12 bg-cream">
+    <div class="mx-auto max-w-[var(--video-max-width)] px-4">
+      <figure class="video mb-0">
+        <!-- Адаптивний контейнер -->
+        <div class="aspect-video w-full overflow-hidden rounded-[var(--video-radius)] shadow-lg bg-black">
+          <iframe
+            class="h-full w-full border-0"
+            src="https://www.youtube.com/embed/gG142GTvqis"
+            title="Поради щодо підготовки до фотосесії від Nicole Frame"
+            aria-label="Відеоролик з порадами фотографа Nicole Frame про підготовку до фотосесії"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <!-- Адаптивний підпис відео -->
+        <figcaption class="mt-3 text-center text-fs-xs md:text-fs-sm font-medium text-muted max-w-xl mx-auto">
+          Подивіться поради фотографа про те, як легко підготуватися до зйомки та почуватися впевнено
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+  <!-- ===================== КІНЕЦЬ МЕДІАБЛОКУ №2 (ВІДЕО) ===================== -->
+
+  <!-- ВІДГУКИ -->
+  <section id="reviews" aria-labelledby="reviews-title" class="sec bg-surface-alt">
+    <div class="wrap">
+      <div class="mb-6 md:mb-[2.5rem]">
+        <h2 id="reviews-title" class="section-title">Відгуки клієнтів</h2>
+        <p class="section-desc pt-3">Щирі враження людей, з якими ми створили незабутні кадрові історії.</p>
+      </div>
+      <div class="mb-8 md:mb-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <!-- МЕДІА: аватари клієнтів (локальні файли assets/images/avatar-*.jpg) -->
+        <article class="flex flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8 shadow-sm">
+          <p class="text-xs md:text-fs-sm leading-relaxed opacity-85">«Планування було легким і зрозумілим, а м'яка підтримка на самій зйомці допомогла мені повністю розслабитися й почуватися впевнено перед камерою.»</p>
+          <div class="flex items-center gap-4">
+            <img src="assets/images/avatar-1.jpg" alt="Олена Коваль" class="size-10 md:size-12 rounded-full object-cover">
+            <div>
+              <p class="text-xs md:text-fs-sm font-semibold">Олена Коваль</p>
+              <p class="text-xs text-muted pt-2">Портретна зйомка</p>
+            </div>
+          </div>
+        </article>
+        <article class="flex flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8 shadow-sm">
+          <p class="text-xs md:text-fs-sm leading-relaxed opacity-85">«Ми хотіли спокійні, живі фото без награних поз. Сесія пройшла абсолютно невимушено й залишила простір для наших справжніх сімейних емоцій.»</p>
+          <div class="flex items-center gap-4">
+            <img src="assets/images/avatar-2.jpg" alt="Максим та Анна" class="size-10 md:size-12 rounded-full object-cover">
+            <div>
+              <p class="text-xs md:text-fs-sm font-semibold">Максим та Анна</p>
+              <p class="text-xs text-muted pt-2">Сімейна історія</p>
+            </div>
+          </div>
+        </article>
+        <article class="flex flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8 shadow-sm">
+          <p class="text-xs md:text-fs-sm leading-relaxed opacity-85">«Чіткий бриф, бездоганно продумана організація зйомки та естетичні кадри, які ідеально передають філософію нашого бренду.»</p>
+          <div class="flex items-center gap-4">
+            <img src="assets/images/avatar-3.jpg" alt="Максим Марченко" class="size-10 md:size-12 rounded-full object-cover">
+            <div>
+              <p class="text-xs md:text-fs-sm font-semibold">Максим Марченко</p>
+              <p class="text-xs text-muted pt-2">Комерційна зйомка</p>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <button type="button" class="icon-btn size-10 md:size-11 text-sm md:text-fs-base" aria-label="Попередній відгук">&larr;</button>
+          <span class="text-xs md:text-fs-sm font-semibold">01 / 03</span>
+          <button type="button" class="icon-btn size-10 md:size-11 text-sm md:text-fs-base" aria-label="Наступний відгук">&rarr;</button>
+        </div>
+        <a href="#calculator" class="btn btn-primary w-full sm:w-auto">Забронювати зйомку</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ФІНАЛЬНИЙ CTA -->
+  <section aria-labelledby="cta-title" class="border-b border-primary py-12 md:py-24 text-center bg-cream">
+    <div class="wrap">
+      <h2 id="cta-title" class="section-title">Готові до фотосесії?</h2>
+      <p class="section-desc mx-auto mb-6 md:mb-9 text-sm md:text-fs-lg text-ink opacity-85 pt-4">Почніть з оцінки вартості або давайте обговоримо ваші ідеї особисто.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
+        <a href="#calculator" class="btn btn-primary h-12 md:h-[3.25rem] w-full sm:w-56 text-sm tracking-wide">Оцінити вартість</a>
+        <a href="#contacts" class="btn btn-outline h-12 md:h-[3.25rem] w-full sm:w-56 text-sm tracking-wide">Написати нам</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       МЕДІАІНТЕГРАЦІЯ №3: ІНТЕРАКТИВНА КАРТА (Google Maps, iframe)
+       - Адреса студії: вул. Під Голоском, 20, Львів
+       - Співвідношення сторін: 4:3 на мобільних, 16:9 на ПК
+       - loading="lazy" — відкладене завантаження
+       - Доступність: title + aria-label
+       - Приватність: referrerpolicy="no-referrer-when-downgrade"
+       ============================================================ -->
+  <section id="contacts" class="py-8 md:py-12 bg-cream">
+    <div class="mx-auto max-w-[var(--map-max-width)] px-4">
+
+      <!-- Заголовок секції -->
+      <div class="text-center mb-6 md:mb-8">
+        <h2 class="font-heading text-fs-xl md:text-fs-3xl font-bold text-ink mb-2 md:mb-3">Як нас знайти</h2>
+        <p class="text-muted text-fs-xs md:text-fs-sm font-medium max-w-md mx-auto">
+          Завітайте до нашої фотостудії за адресою: вул. Під Голоском, 20
+        </p>
+      </div>
+
+      <!-- Контейнер карти -->
+      <figure class="media-container w-full aspect-[4/3] md:aspect-video rounded-none shadow-md">
+        <iframe
+          class="w-full h-full border-0"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2571.482165285022!2d23.999797576447364!3d49.87097122891816!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x473addca83080a49%3A0x2dae445f57b188!2z0LLRg9C70LjRhtGPINCf0ZbQtCDQk9C-0LvQvtGB0LrQvtC8LCAyMCwg0JvRjNCy0ZbQsiwg0JvRjNCy0ZbQstGB0YzQutCwINC-0LHQu9Cw0YHRgtGMLCA3OTAwMA!5e0!3m2!1suk!2sua!4v1793791169425!5m2!1suk!2sua"
+          title="Розташування фотостудії Nicole Frame на карті Google Maps"
+          aria-label="Інтерактивна карта Google Maps із адресою фотостудії Nicole Frame: вул. Під Голоском, 20, Львів"
+          allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          referrerpolicy="no-referrer-when-downgrade"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+      </figure>
+
+    </div>
+  </section>
+  <!-- ===================== КІНЕЦЬ МЕДІАБЛОКУ №3 (КАРТА) ===================== -->
+
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-surface-alt pt-4">
+  <div class="wrap">
+    <div class="grid gap-8 md:gap-16 py-10 md:py-20 md:grid-cols-[1.5fr_1fr_1.4fr]">
+      <div>
+        <div class="logo">
+          <!-- МЕДІА: логотип у футері (SVG) -->
+          <img src="assets/icons/logo.svg" alt="Nicole Frame" class="h-12 md:h-[4.9rem] w-auto">
+        </div>
+        <p class="mt-4 md:mt-6 text-sm md:text-fs-lg leading-relaxed opacity-85">Особисті історії. Цілеспрямовані бренд-образи.<br>Фотографія для людей, моментів і бізнесу.</p>
+      </div>
+      <div>
+        <h2 class="mb-4 md:mb-6 font-heading text-xl md:text-[1.8rem] font-medium">Навігація</h2>
+        <nav aria-label="Навігація у підвалі">
+          <ul class="flex flex-col gap-2 md:gap-4 text-sm md:text-fs-lg">
+            <li><a href="#portfolio" class="footer-link">Портфоліо</a></li>
+            <li><a href="#process" class="footer-link">Послуги</a></li>
+            <li><a href="#about" class="footer-link">Про мене</a></li>
+            <li><a href="#" class="footer-link">Блог</a></li>
+            <li><a href="#contacts" class="footer-link">Контакти</a></li>
+            <li><a href="#calculator" class="footer-link">Розрахувати вартість</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div>
+        <h2 class="mb-4 md:mb-6 font-heading text-xl md:text-[1.8rem] font-medium">Плануйте зйомку</h2>
+        <address class="flex flex-col gap-3 md:gap-5 text-sm md:text-fs-lg not-italic">
+          <!-- МЕДІА: іконки Font Awesome (envelope, phone) -->
+          <a href="mailto:hello@nicoleframe.example" class="inline-flex items-center gap-3 transition duration-300 hover:text-primary"><i class="fa-solid fa-envelope text-primary" aria-hidden="true"></i> hello@nicoleframe.example</a>
+          <a href="tel:+00000000000" class="inline-flex items-center gap-3 transition duration-300 hover:text-primary"><i class="fa-solid fa-phone text-primary" aria-hidden="true"></i> +00 000 000 000</a>
+          <p class="-mt-1 text-xs md:text-fs-sm text-muted">Контактні дані — заповнювачі.</p>
+        </address>
+        <!-- МЕДІА: іконки соцмереж Font Awesome Brands -->
+        <nav class="mt-5 md:mt-7 flex gap-4 md:gap-5" aria-label="Соціальні мережі">
+          <a href="#" aria-label="Instagram" class="icon-btn size-10 md:size-[3.5rem]"><i class="fa-brands fa-instagram text-xl md:text-[2.35rem]" aria-hidden="true"></i></a>
+          <a href="#" aria-label="Facebook" class="icon-btn size-10 md:size-[3.5rem]"><i class="fa-brands fa-facebook-f text-xl md:text-[2.35rem]" aria-hidden="true"></i></a>
+          <a href="#" aria-label="LinkedIn" class="icon-btn size-10 md:size-[3.5rem]"><i class="fa-brands fa-linkedin-in text-xl md:text-[2.35rem]" aria-hidden="true"></i></a>
+        </nav>
+      </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-primary py-6 md:py-8 text-xs md:text-fs-base opacity-85">
+      <p><small class="text-inherit">&copy; 2026 Nicole Frame. Усі права захищені.</small></p>
+      <p><a href="#" class="transition duration-300 hover:text-primary">Політика конфіденційності</a></p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
