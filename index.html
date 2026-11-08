@@ -512,11 +512,21 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     Надіслати заявку
   </button>
 </form>
-<div id="form-success" tabindex="-1" role="status" class="hidden border border-emerald-500 bg-emerald-50 p-6 text-center">
-  <h4 class="mb-2 font-heading text-xl font-semibold text-emerald-800">Дякуємо! Заявку надіслано</h4>
-  <p class="mb-4 text-sm text-emerald-900">Я зв'яжуся з вами найближчим часом, щоб підтвердити дату та деталі.</p>
-  <button type="button" id="success-reset" class="btn btn-outline min-h-12">Надіслати ще одну заявку</button>
-</div>
+<!-- МОДАЛЬНЕ ВІКНО: імітація успішного надсилання -->
+<dialog id="success-modal"
+        aria-labelledby="success-title" aria-describedby="success-desc"
+        class="m-auto w-[calc(100%-2rem)] max-w-md border border-emerald-500 bg-white p-0 text-ink shadow-xl backdrop:bg-ink/60">
+  <div class="p-6 text-center md:p-8">
+    <div class="mx-auto mb-4 grid size-12 place-items-center rounded-full border border-emerald-500 text-emerald-600" aria-hidden="true">
+      <i class="fa-solid fa-check text-xl"></i>
+    </div>
+    <h2 id="success-title" class="mb-2 text-xl md:text-2xl">Дякуємо! Ваше повідомлення успішно надіслано.</h2>
+    <p id="success-desc" class="mb-6 text-sm text-muted md:text-base">
+      Це імітація надсилання: дані нікуди не передаються, бо сервер не підключено.
+    </p>
+    <button type="button" id="success-close" class="btn btn-primary min-h-12 w-full">Закрити</button>
+  </div>
+</dialog>
 
 
 <!-- Згода: інформаційний текст під кнопкою (чекбокса немає) -->

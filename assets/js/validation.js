@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const agreementInput = document.querySelector('#user-agreement'); // за таблицею чекбокса немає
 
   const alertBox   = document.querySelector('#form-alert');
-  const successBox = document.querySelector('#form-success');
-  const resetBtn   = document.querySelector('#success-reset');
+  const modal      = document.querySelector('#success-modal');
+  const modalClose = document.querySelector('#success-close');
   const submitBtn  = document.querySelector('#submit-btn');
   const submitHTML = submitBtn.innerHTML;
 
@@ -308,23 +308,31 @@ document.addEventListener('DOMContentLoaded', () => {
     setLoading(true);
 
     // Імітація відправки (бекенду немає)
+     // Імітація успішного надсилання (бекенду немає)
     setTimeout(() => {
       setLoading(false);
       resetForm();
-      form.classList.add('hidden');
-      if (successBox) {
-        successBox.classList.remove('hidden');
-        successBox.focus();
-      }
+      openModal();
     }, 1500);
   });
 
-  // Кнопка «Надіслати ще одну заявку»
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      successBox.classList.add('hidden');
-      form.classList.remove('hidden');
-      nameInput.focus();
-    });
+  // ================= 6. МОДАЛЬНЕ ВІКНО =================
+  function openModal() {
+    if (modal && typeof modal.showModal === 'function') {
+      modal.showModal();            // фокус автоматично переходить усередину вікна
+    } else {
+      alert('Дякуємо! Ваше повідомлення успішно надіслано.'); // запасний варіант для старих браузерів
+    }
   }
-});
+
+  if (modal) {
+    modalClose.addEventListener('click', () => modal.close());
+
+    // Клік по затемненню (поза вікном) теж закриває
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.close();
+    });
+
+    // Після закриття повертаємо фокус на початок форми
+    modal.addEventListener('close', () => nameInput.focus());
+  }});
