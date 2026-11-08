@@ -433,32 +433,68 @@
           </div>
 
           <p class="mb-6 text-xs text-muted">Остаточна ціна та доступність підтверджуються особисто. Для закріплення дати потрібен депозит 30%.</p>
+ <!-- ФОРМА -->
 
-       <form id="lead-form" class="flex flex-col gap-4" novalidate>
-            <div class="form-group">
-              <label for="user-name" class="text-sm font-semibold">Ваше ім'я</label>
-              <input type="text" id="user-name" name="name" placeholder="Повне ім'я" required class="field">
-            </div>
+  <form id="lead-form" class="flex flex-col gap-4" novalidate>
+  <div id="form-alert" role="alert" class="hidden border border-red-600 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
 
-            <div class="form-group">
-              <label for="user-email" class="text-sm font-semibold">Електронна пошта</label>
-              <input type="email" id="user-email" name="email" placeholder="you@example.com" required class="field">
-            </div>
+  <!-- Ім'я -->
+  <div class="form-group">
+    <label for="user-name" class="text-sm font-semibold">Ваше ім'я</label>
+    <input type="text" id="user-name" name="name"
+           autocomplete="name" autocapitalize="words"
+           required aria-required="true" aria-describedby="user-name-error" class="field">
+    <p id="user-name-error" class="hidden text-sm text-red-700">Будь ласка, введіть ім'я (мін. 2 символи)</p>
+  </div>
 
-            <div class="form-group">
-              <label for="user-phone" class="text-sm font-semibold">Номер телефону</label>
-              <input type="tel" id="user-phone" name="phone" placeholder="+380 (__) ___-__-__" required class="field">
-            </div>
+  <!-- Email -->
+  <div class="form-group">
+    <label for="user-email" class="text-sm font-semibold">Електронна пошта</label>
+    <input type="email" id="user-email" name="email" placeholder="you@example.com"
+           inputmode="email" autocomplete="email" autocorrect="off" autocapitalize="off"
+           required aria-required="true" aria-describedby="user-email-error" class="field">
+    <p id="user-email-error" class="hidden text-sm text-red-700">Введіть коректну адресу електронної пошти</p>
+  </div>
 
-            <div class="form-group">
-              <label for="user-date" class="text-sm font-semibold">Бажана дата (необов'язково)</label>
-              <input type="date" id="user-date" name="date" class="field">
-            </div>
+  <!-- Телефон -->
+  <div class="form-group">
+    <label for="user-phone" class="text-sm font-semibold">Номер телефону</label>
+    <input type="tel" id="user-phone" name="phone" placeholder="+380 (__) ___-__-__"
+           inputmode="tel" autocomplete="tel"
+           required aria-required="true" aria-describedby="user-phone-error" class="field">
+    <p id="user-phone-error" class="hidden text-sm text-red-700">Введіть повний номер телефону</p>
+  </div>
 
-            <button type="submit" class="mt-2 w-full bg-primary text-white py-3 px-6 text-sm md:text-fs-base font-semibold hover:opacity-90 transition-opacity">Надіслати заявку</button>
-          </form>
+  <!-- Дата -->
+  <div class="form-group">
+    <label for="user-date" class="text-sm font-semibold">Бажана дата (необов'язково)</label>
+    <input type="date" id="user-date" name="date" aria-describedby="user-date-error" class="field">
+    <p id="user-date-error" class="hidden text-sm text-red-700">Оберіть дату починаючи від сьогодні</p>
+  </div>
 
-          <p class="mt-4 text-xs text-muted text-center">Надсилаючи заявку, ви погоджуєтеся з Політикою конфіденційності. Це запит, а не підтверджене бронювання.</p>
+  <!-- Повідомлення -->
+  <div class="form-group">
+    <label for="user-message" class="text-sm font-semibold">Повідомлення (необов'язково)</label>
+    <textarea id="user-message" name="message" rows="2" maxlength="1000"
+          aria-describedby="user-message-error" class="field min-h-[5rem] resize-y"></textarea>
+    <p id="user-message-error" class="hidden text-sm text-red-700">Повідомлення не може перевищувати 1000 символів</p>
+  </div>
+
+  <!-- Кнопка -->
+  <button type="submit" id="submit-btn"
+          class="mt-2 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-6 py-3 text-sm md:text-fs-base font-semibold text-white transition-opacity hover:opacity-90">
+    Надіслати заявку
+  </button>
+</form>
+
+<!-- Згода: інформаційний текст під кнопкою (чекбокса немає) -->
+<p class="mt-4 text-center text-xs leading-relaxed text-muted">
+  Надсилаючи заявку, ви погоджуєтеся з
+  <a href="#" target="_blank" rel="noopener"
+     class="relative underline hover:text-primary after:absolute after:-inset-3 after:content-['']">Політикою конфіденційності</a>.
+  Це запит, а не підтверджене бронювання.
+</p>
+      
         </div>
       </div>
     </div>
