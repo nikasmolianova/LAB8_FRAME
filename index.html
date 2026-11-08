@@ -125,7 +125,33 @@
     .section-title { @apply mb-2 text-2xl sm:text-3xl md:text-[3.25rem]; }
     .section-desc { @apply mb-8 max-w-[78ch] text-fs-base text-muted; }
     /* поля вводу: білий фон, бордова рамка, підсвічування при фокусі */
-    .field { @apply min-h-[3.4rem] w-full rounded-none border border-primary bg-white px-4 py-[0.7rem] text-fs-base transition duration-300 placeholder:text-muted focus:ring-2 focus:ring-primary; }
+    .field { @apply min-h-[3.4rem] w-full rounded-none border border-primary bg-white px-4 py-[0.7rem] text-fs-base transition duration-300 placeholder:text-muted hover:bg-cream focus:ring-2 focus:ring-primary; scroll-margin-top: 8rem; }
+
+/* Error */
+.field[aria-invalid="true"] {
+  @apply border-red-600 bg-red-50 pr-12 focus:ring-red-600;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23dc2626' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='8'/%3E%3Cpath d='M10 6v5M10 14h.01'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+}
+
+/* Success */
+.field[data-state="valid"] {
+  @apply border-emerald-500 pr-12 focus:ring-emerald-500;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10.5l4 4 8-9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+}
+
+/* Поле дати: іконка лівіше від рідного значка календаря */
+input[type="date"].field[aria-invalid="true"],
+input[type="date"].field[data-state="valid"] { background-position: right 3rem center; }
+
+/* Textarea: іконка вгорі, а не посередині */
+textarea.field[aria-invalid="true"],
+textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     .form-group { @apply mb-5 flex flex-col gap-[0.6rem]; }
     .form-group label, legend { @apply text-fs-md font-medium; }
 
@@ -435,8 +461,8 @@
           <p class="mb-6 text-xs text-muted">Остаточна ціна та доступність підтверджуються особисто. Для закріплення дати потрібен депозит 30%.</p>
  <!-- ФОРМА -->
 
-  <form id="lead-form" class="flex flex-col gap-4" novalidate>
-  <div id="form-alert" role="alert" class="hidden border border-red-600 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+<form id="lead-form" class="mx-auto grid w-full max-w-2xl grid-cols-1 gap-x-4 sm:grid-cols-2 md:grid-cols-1 min-[1600px]:grid-cols-2" novalidate>
+  <div id="form-alert" role="alert" class="col-span-full mb-4 hidden border border-red-600 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
 
   <!-- Ім'я -->
   <div class="form-group">
@@ -472,20 +498,26 @@
     <p id="user-date-error" class="hidden text-sm text-red-700">Оберіть дату починаючи від сьогодні</p>
   </div>
 
-  <!-- Повідомлення -->
-  <div class="form-group">
+  <!-- Повідомлення: на всю ширину -->
+  <div class="form-group col-span-full">
     <label for="user-message" class="text-sm font-semibold">Повідомлення (необов'язково)</label>
     <textarea id="user-message" name="message" rows="2" maxlength="1000"
-          aria-describedby="user-message-error" class="field min-h-[5rem] resize-y"></textarea>
+              aria-describedby="user-message-error" class="field min-h-[5rem] resize-y"></textarea>
     <p id="user-message-error" class="hidden text-sm text-red-700">Повідомлення не може перевищувати 1000 символів</p>
   </div>
 
-  <!-- Кнопка -->
+  <!-- Кнопка: на всю ширину -->
   <button type="submit" id="submit-btn"
-          class="mt-2 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-6 py-3 text-sm md:text-fs-base font-semibold text-white transition-opacity hover:opacity-90">
+          class="col-span-full mt-2 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 md:text-fs-base">
     Надіслати заявку
   </button>
 </form>
+<div id="form-success" tabindex="-1" role="status" class="hidden border border-emerald-500 bg-emerald-50 p-6 text-center">
+  <h4 class="mb-2 font-heading text-xl font-semibold text-emerald-800">Дякуємо! Заявку надіслано</h4>
+  <p class="mb-4 text-sm text-emerald-900">Я зв'яжуся з вами найближчим часом, щоб підтвердити дату та деталі.</p>
+  <button type="button" id="success-reset" class="btn btn-outline min-h-12">Надіслати ще одну заявку</button>
+</div>
+
 
 <!-- Згода: інформаційний текст під кнопкою (чекбокса немає) -->
 <p class="mt-4 text-center text-xs leading-relaxed text-muted">
