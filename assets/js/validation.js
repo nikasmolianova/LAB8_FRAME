@@ -158,18 +158,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ================= 5. ПОДІЇ =================
   const touched = new Set(); // поля, з яких користувач уже виходив
-
-  fields.forEach(({ input, validate }) => {
-    // Перша перевірка при виході з поля
+  /**
+   * М'яка перевірка під час першого набору:
+   * якщо значення вже коректне, показуємо успіх;
+   * якщо ні, лишаємо поле нейтральним (без червоного).
+   */
+  function softValidate(input, validate) {
+    // validate() сама малює і помилку, і успіх, тож результат
+    // перевіряємо, а при невдачі прибираємо червоне
+    if (validate()) return;
+    clearError(input);
+  }
+    fields.forEach(({ input, validate }) => {
+    // blur: фінальна перевірка поля, показує і помилку, і успіх
     input.addEventListener('blur', () => {
       touched.add(input);
       validate();
     });
 
-    // Далі перевіряємо на кожен символ, щоб помилка зникала одразу
     input.addEventListener('input', () => {
       if (input === phoneInput) input.value = formatPhone(input.value);
-      if (touched.has(input)) validate();
+
+      if (touched.has(input)) {
+        // Поле вже «пройдене»: оновлюємо стан на кожен символ
+        validate();
+      } else {
+        // Користувач ще пише вперше: показуємо тільки успіх, без червоного
+        softValidate(input, validate);
+      }
     });
   });
 
