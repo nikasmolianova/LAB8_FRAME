@@ -2,10 +2,10 @@
  * Валідація форми заявки Nicole Frame (Vanilla JS, без бібліотек).
  * Структура файлу:
  *   1. Константи та RegEx
- *   2. Допоміжні функції (маска телефону)
+ *   2. Маска телефону та edge cases
  *   3. UI-функції: showError / showSuccess / clearError
  *   4. Функції валідації окремих полів
- *   5. Відправка форми та події
+ *   5. Динамічна валідація, відправка форми
  */
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('#lead-form');
@@ -28,40 +28,113 @@ document.addEventListener('DOMContentLoaded', () => {
   const messageInput   = document.querySelector('#user-message');
   const agreementInput = document.querySelector('#user-agreement'); // за таблицею чекбокса немає
 
-  const alertBox  = document.querySelector('#form-alert');
+  const alertBox   = document.querySelector('#form-alert');
   const successBox = document.querySelector('#form-success');
-  const resetBtn  = document.querySelector('#success-reset');
-  const submitBtn = document.querySelector('#submit-btn');
+  const resetBtn   = document.querySelector('#success-reset');
+  const submitBtn  = document.querySelector('#submit-btn');
   const submitHTML = submitBtn.innerHTML;
 
   dateInput.min = TODAY; // нативний календар блокує минулі дні
 
   // ================= 2. МАСКА ТЕЛЕФОНУ =================
-  // Лишає тільки 9 цифр після коду 380 (приймає 050..., 80..., 380... та +380...)
-  function getLocalDigits(raw) {
-    const d = raw.replace(/\D/g, '');
-    let local;
-    if (d.startsWith('380')) local = d.slice(3);
-    else if ('380'.startsWith(d)) local = '';
-    else if (d.startsWith('80')) local = d.slice(2);
-    else if (d.startsWith('0')) local = d.slice(1);
-    else local = d;
-    return local.slice(0, 9);
+  const PHONE_LOCAL_MAX = 12;   // 9 потрібних + запас, щоб показати помилку «забагато»
+  let lastPhoneDigits = '';     // цифри з попереднього стану поля (для Backspace)
+
+  /** Цифри після коду 380: приймає 050..., 50..., 380..., +380 (050)... */
+  function parsePhoneDigits(raw) {
+    let d = raw.replace(/\D/g, '');
+    if (d.startsWith('380')) {
+      d = d.slice(3);
+      if (d.startsWith('0')) d = d.slice(1);   // "+380 (050)" -> лишній 0
+    } else if (d && '380'.startsWith(d)) {
+      d = '';                                  // "3", "38": ще набирає код країни
+    } else if (d.startsWith('0')) {
+      d = d.slice(1);                          // 050... -> 50...
+    }
+    return d.slice(0, PHONE_LOCAL_MAX);
   }
 
-  // Форматує у вигляд +380 (XX) XXX-XX-XX
+  /** Форматує у +380 (XX) XXX-XX-XX. Надлишок цифр лишається видимим. */
   function formatPhone(raw) {
-    const l = getLocalDigits(raw);
-    if (!l) return '';
-    let out = '+380 (' + l.slice(0, 2);
-    if (l.length > 2) out += ') ' + l.slice(2, 5);
-    if (l.length > 5) out += '-' + l.slice(5, 7);
-    if (l.length > 7) out += '-' + l.slice(7, 9);
+    const digits = raw.replace(/\D/g, '');
+    const local = parsePhoneDigits(raw);
+
+    if (!local) {
+      if (!digits) return '';
+      if ('380'.startsWith(digits)) return '+' + digits;  // як набрав користувач
+      return '+380 (';                                    // користувач почав з 0
+    }
+    let out = '+380 (' + local.slice(0, 2);
+    if (local.length > 2) out += ') ' + local.slice(2, 5);
+    if (local.length > 5) out += '-' + local.slice(5, 7);
+    if (local.length > 7) out += '-' + local.slice(7);
     return out;
   }
 
-  // "+380 (50) 123-45-67" -> "+380501234567" (для перевірки RegEx)
+  // "+380 (50) 123-45-67" -> "+380501234567" (для RegEx)
   const normalizePhone = (value) => '+' + value.replace(/\D/g, '');
+
+  // --- Курсор ---
+  const countDigitsBefore = (str, pos) => str.slice(0, pos).replace(/\D/g, '').length;
+
+  function positionAfterDigits(str, k) {
+    if (k <= 0) return Math.min(1, str.length);
+    let seen = 0;
+    for (let i = 0; i < str.length; i++) {
+      if (/\d/.test(str[i]) && ++seen === k) return i + 1;
+    }
+    return str.length;
+  }
+
+  // --- Підказка про літери (елемент необов'язковий) ---
+  const phoneHint = document.querySelector('#user-phone-hint');
+  let phoneHintTimer;
+  function showPhoneHint(show) {
+    if (!phoneHint) return;
+    clearTimeout(phoneHintTimer);
+    phoneHint.classList.toggle('hidden', !show);
+    if (show) phoneHintTimer = setTimeout(() => phoneHint.classList.add('hidden'), 3000);
+  }
+
+  /**
+   * Обробка input у полі телефону.
+   * Повертає true, якщо цифр забагато (тоді помилку показуємо одразу).
+   */
+  function handlePhoneInput(event) {
+    const raw = phoneInput.value;
+    const caret = phoneInput.selectionStart;
+    const caretAtEnd = caret === raw.length;
+    let digits = raw.replace(/\D/g, '');
+    let k = countDigitsBefore(raw, caret);
+
+    // Літери та інші сторонні символи: відкидаємо, але пояснюємо
+    showPhoneHint(/[^\d\s()+\-]/.test(raw));
+
+    // Backspace по роздільнику: цифри не змінились, тож видаляємо цифру перед курсором
+    if (event.inputType === 'deleteContentBackward' && digits === lastPhoneDigits && k > 0) {
+      digits = digits.slice(0, k - 1) + digits.slice(k);
+      k -= 1;
+    }
+
+    const formatted = formatPhone(digits);
+    phoneInput.value = formatted;
+    lastPhoneDigits = formatted.replace(/\D/g, '');
+
+    // Курсор лишаємо на місці, якщо редагували всередині й цифри не зсунулись
+    if (!caretAtEnd && lastPhoneDigits === digits) {
+      const pos = positionAfterDigits(formatted, k);
+      phoneInput.setSelectionRange(pos, pos);
+    }
+    return parsePhoneDigits(digits).length > 9;
+  }
+
+  /** Конкретне повідомлення про помилку телефону */
+  function getPhoneError(value) {
+    const n = parsePhoneDigits(value).length;
+    if (!value.trim()) return 'Введіть номер телефону';
+    if (n > 9) return `Забагато цифр: після +380 має бути рівно 9, зараз ${n}`;
+    return `Номер неповний: після +380 потрібно 9 цифр, зараз ${n}`;
+  }
 
   // ================= 3. UI-ФУНКЦІЇ =================
   const getErrorEl = (input) => document.getElementById(input.id + '-error');
@@ -115,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showSuccess(phoneInput);
       return true;
     }
-    showError(phoneInput);
+    showError(phoneInput, getPhoneError(phoneInput.value));
     return false;
   }
 
@@ -156,35 +229,41 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   if (agreementInput) fields.push({ input: agreementInput, validate: validateAgreement });
 
-  // ================= 5. ПОДІЇ =================
+  // ================= 5. ДИНАМІЧНА ВАЛІДАЦІЯ І ПОДІЇ =================
   const touched = new Set(); // поля, з яких користувач уже виходив
+
   /**
    * М'яка перевірка під час першого набору:
-   * якщо значення вже коректне, показуємо успіх;
-   * якщо ні, лишаємо поле нейтральним (без червоного).
+   * коректне значення показує успіх, некоректне лишає поле нейтральним (без червоного).
    */
   function softValidate(input, validate) {
-    // validate() сама малює і помилку, і успіх, тож результат
-    // перевіряємо, а при невдачі прибираємо червоне
     if (validate()) return;
     clearError(input);
   }
-    fields.forEach(({ input, validate }) => {
+
+  // Телефон: якщо лишився тільки префікс без цифр, очищаємо поле (спрацює раніше за загальний blur)
+  phoneInput.addEventListener('blur', () => {
+    if (!parsePhoneDigits(phoneInput.value)) phoneInput.value = '';
+    lastPhoneDigits = phoneInput.value.replace(/\D/g, '');
+  });
+
+  fields.forEach(({ input, validate }) => {
     // blur: фінальна перевірка поля, показує і помилку, і успіх
     input.addEventListener('blur', () => {
       touched.add(input);
       validate();
     });
 
-    input.addEventListener('input', () => {
-      if (input === phoneInput) input.value = formatPhone(input.value);
+    input.addEventListener('input', (event) => {
+      if (input === phoneInput) {
+        const tooManyDigits = handlePhoneInput(event);
+        if (tooManyDigits) { validate(); return; }   // надлишок цифр показуємо одразу
+      }
 
       if (touched.has(input)) {
-        // Поле вже «пройдене»: оновлюємо стан на кожен символ
-        validate();
+        validate();                       // поле вже «пройдене»: оновлюємо на кожен символ
       } else {
-        // Користувач ще пише вперше: показуємо тільки успіх, без червоного
-        softValidate(input, validate);
+        softValidate(input, validate);    // перший набір: тільки успіх, без червоного
       }
     });
   });
@@ -201,6 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetForm() {
     form.reset();
     touched.clear();
+    lastPhoneDigits = '';
+    showPhoneHint(false);
     fields.forEach(({ input }) => clearError(input));
     alertBox.classList.add('hidden');
   }
@@ -208,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    // Перевіряємо ВСІ поля (щоб підсвітити всі помилки одразу)
+    // Перевіряємо ВСІ поля, щоб підсвітити всі помилки одразу
     let firstInvalid = null;
     fields.forEach(({ input, validate }) => {
       touched.add(input);
