@@ -6,14 +6,15 @@
  *   3. UI-функції: showError / showSuccess / clearError
  *   4. Функції валідації окремих полів
  *   5. Динамічна валідація, відправка форми
+ *   6. Модальне вікно
  */
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('#lead-form');
   if (!form) return;
 
   // ================= 1. КОНСТАНТИ =================
-  const REGEX_NAME  = /^[\p{L}][\p{L}\s'’ʼ-]+$/u;   // літери, пробіли, дефіс, апостроф; мін. 2 символи
-  const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // name@domain.tld
+  const REGEX_NAME = /^\p{L}+(?:[ '\u2019\u02BC-]\p{L}+)*$/u;  // літери, пробіли, дефіс, апостроф; мін. 2 символи
+  const REGEX_EMAIL = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+$/; // name@domain.tld
   const REGEX_PHONE = /^\+380\d{9}$/;                // +380 і рівно 9 цифр
   const MAX_MESSAGE = 1000;
 
@@ -139,31 +140,40 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================= 3. UI-ФУНКЦІЇ =================
   const getErrorEl = (input) => document.getElementById(input.id + '-error');
 
+  /** Зв'язати поле з повідомленням лише коли помилка видима */
+  function setDescribedBy(input, on) {
+    if (on) input.setAttribute('aria-describedby', input.id + '-error');
+    else input.removeAttribute('aria-describedby');
+  }
+
   /** Показати помилку: червона рамка (aria-invalid) + текст під полем */
   function showError(input, message) {
     const errorEl = getErrorEl(input);
     input.removeAttribute('data-state');
     input.setAttribute('aria-invalid', 'true');
+    setDescribedBy(input, true);
     if (errorEl) {
       if (message) errorEl.textContent = message;
-      errorEl.classList.remove('hidden');
+      errorEl.classList.remove('invisible');
     }
   }
 
-  /** Показати успіх: зелена рамка (data-state="valid") + галочка, без тексту помилки */
+  /** Показати успіх: зелена рамка (data-state="valid") + галочка */
   function showSuccess(input) {
     const errorEl = getErrorEl(input);
-    input.removeAttribute('aria-invalid');
+    input.setAttribute('aria-invalid', 'false');
     input.dataset.state = 'valid';
-    if (errorEl) errorEl.classList.add('hidden');
+    setDescribedBy(input, false);
+    if (errorEl) errorEl.classList.add('invisible');
   }
 
   /** Повернути поле у нейтральний стан */
   function clearError(input) {
     const errorEl = getErrorEl(input);
-    input.removeAttribute('aria-invalid');
+    input.setAttribute('aria-invalid', 'false');
     input.removeAttribute('data-state');
-    if (errorEl) errorEl.classList.add('hidden');
+    setDescribedBy(input, false);
+    if (errorEl) errorEl.classList.add('invisible');
   }
 
   // ================= 4. ВАЛІДАЦІЯ ПОЛІВ =================
@@ -228,6 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
     { input: messageInput, validate: validateMessage },
   ];
   if (agreementInput) fields.push({ input: agreementInput, validate: validateAgreement });
+
+  // Початковий стан: aria-invalid="false"; помилки озвучуються при появі
+  fields.forEach(({ input }) => {
+    const errorEl = getErrorEl(input);
+    if (errorEl) errorEl.setAttribute('aria-live', 'polite');
+    clearError(input);
+  });
 
   // ================= 5. ДИНАМІЧНА ВАЛІДАЦІЯ І ПОДІЇ =================
   const touched = new Set(); // поля, з яких користувач уже виходив
@@ -307,8 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     alertBox.classList.add('hidden');
     setLoading(true);
 
-    // Імітація відправки (бекенду немає)
-     // Імітація успішного надсилання (бекенду немає)
+    // Імітація успішного надсилання (бекенду немає)
     setTimeout(() => {
       setLoading(false);
       resetForm();
@@ -335,4 +351,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Після закриття повертаємо фокус на початок форми
     modal.addEventListener('close', () => nameInput.focus());
-  }});
+  }
+});

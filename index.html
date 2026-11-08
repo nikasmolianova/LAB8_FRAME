@@ -138,7 +138,7 @@
 
 /* Success */
 .field[data-state="valid"] {
-  @apply border-emerald-500 pr-12 focus:ring-emerald-500;
+  @apply border-emerald-600 pr-12 focus:ring-emerald-600;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10.5l4 4 8-9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
@@ -152,7 +152,7 @@ input[type="date"].field[data-state="valid"] { background-position: right 3rem c
 /* Textarea: іконка вгорі, а не посередині */
 textarea.field[aria-invalid="true"],
 textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
-    .form-group { @apply mb-5 flex flex-col gap-[0.6rem]; }
+   .form-group { @apply mb-1 flex flex-col gap-[0.6rem]; }
     .form-group label, legend { @apply text-fs-md font-medium; }
 
     .nav-link { @apply whitespace-nowrap font-medium text-primary transition duration-300 hover:text-secondary; }
@@ -470,7 +470,7 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     <input type="text" id="user-name" name="name"
            autocomplete="name" autocapitalize="words"
            required aria-required="true" aria-describedby="user-name-error" class="field">
-    <p id="user-name-error" class="hidden text-sm text-red-700">Будь ласка, введіть ім'я (мін. 2 символи)</p>
+    <p id="user-name-error" class="invisible min-h-[1.25rem] text-sm text-red-700">Будь ласка, введіть ім'я (мін. 2 символи)</p>
   </div>
 
   <!-- Email -->
@@ -479,7 +479,7 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     <input type="email" id="user-email" name="email" placeholder="you@example.com"
            inputmode="email" autocomplete="email" autocorrect="off" autocapitalize="off"
            required aria-required="true" aria-describedby="user-email-error" class="field">
-    <p id="user-email-error" class="hidden text-sm text-red-700">Введіть коректну адресу електронної пошти</p>
+    <p id="user-email-error" class="invisible min-h-[1.25rem] text-sm text-red-700">Введіть коректну адресу електронної пошти</p>
   </div>
 
   <!-- Телефон -->
@@ -488,14 +488,14 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     <input type="tel" id="user-phone" name="phone" placeholder="+380 (__) ___-__-__"
            inputmode="tel" autocomplete="tel"
            required aria-required="true" aria-describedby="user-phone-error" class="field">
-    <p id="user-phone-error" class="hidden text-sm text-red-700">Введіть повний номер телефону</p>
+    <p id="user-phone-error" class="invisible min-h-[1.25rem] text-sm text-red-700">Введіть повний номер телефону</p>
   </div>
 
   <!-- Дата -->
   <div class="form-group">
     <label for="user-date" class="text-sm font-semibold">Бажана дата (необов'язково)</label>
     <input type="date" id="user-date" name="date" aria-describedby="user-date-error" class="field">
-    <p id="user-date-error" class="hidden text-sm text-red-700">Оберіть дату починаючи від сьогодні</p>
+    <p id="user-date-error" class="invisible min-h-[1.25rem] text-sm text-red-700">Оберіть дату починаючи від сьогодні</p>
   </div>
 
   <!-- Повідомлення: на всю ширину -->
@@ -503,7 +503,7 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     <label for="user-message" class="text-sm font-semibold">Повідомлення (необов'язково)</label>
     <textarea id="user-message" name="message" rows="2" maxlength="1000"
               aria-describedby="user-message-error" class="field min-h-[5rem] resize-y"></textarea>
-    <p id="user-message-error" class="hidden text-sm text-red-700">Повідомлення не може перевищувати 1000 символів</p>
+    <p id="user-message-error" class="invisible min-h-[1.25rem] text-sm text-red-700">Повідомлення не може перевищувати 1000 символів</p>
   </div>
 
   <!-- Кнопка: на всю ширину -->
