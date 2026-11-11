@@ -1,12 +1,5 @@
 /**
  * Валідація форми заявки Nicole Frame (Vanilla JS, без бібліотек).
- * Структура файлу:
- *   1. Константи та RegEx
- *   2. Маска телефону та edge cases
- *   3. UI-функції: showError / showSuccess / clearError
- *   4. Функції валідації окремих полів
- *   5. Динамічна валідація, відправка форми
- *   6. Модальне вікно
  */
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('#lead-form');
@@ -27,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const phoneInput     = document.querySelector('#user-phone');
   const dateInput      = document.querySelector('#user-date');
   const messageInput   = document.querySelector('#user-message');
-  const agreementInput = document.querySelector('#user-agreement'); // за таблицею чекбокса немає
+  const agreementInput = document.querySelector('#user-agreement'); 
 
   const alertBox   = document.querySelector('#form-alert');
   const modal      = document.querySelector('#success-modal');
@@ -179,12 +172,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================= 4. ВАЛІДАЦІЯ ПОЛІВ =================
   // Кожна функція повертає true (поле валідне) або false.
 
-  function validateName() {
-    const value = nameInput.value.trim();
-    if (REGEX_NAME.test(value)) { showSuccess(nameInput); return true; }
-    showError(nameInput);
+ function validateName() {
+  const value = nameInput.value.trim();
+
+  // 1. Не менше 2 символів
+  if (value.length < 2) {
+    showError(nameInput, 'Ім\'я має містити щонайменше 2 символи');
     return false;
   }
+
+  // 2. Не повинно складатися лише з розділових знаків (дефіс, апостроф, пробіли)
+  if (/^[ '\u2019\u02BC-]+$/.test(value)) {
+    showError(nameInput, 'Введіть коректне ім\'я (не лише апостроф чи дефіс)');
+    return false;
+  }
+
+  // 3. Загальна перевірка регуляторним виразом
+  if (REGEX_NAME.test(value)) {
+    showSuccess(nameInput);
+    return true;
+  }
+
+  showError(nameInput, 'Ім\'я може містити лише літери, дефіс та апостроф');
+  return false;
+}
 
   function validateEmail() {
     const value = emailInput.value.trim();
