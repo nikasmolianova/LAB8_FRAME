@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!form) return;
 
   // ================= 1. КОНСТАНТИ =================
-  const REGEX_NAME = /^\p{L}+(?:[ '\u2019\u02BC-]\p{L}+)*$/u;  // літери, пробіли, дефіс, апостроф; мін. 2 символи
+  // Дозволяє дефіс чи апостроф як усередині, так і в кінці під час набору
+  const REGEX_NAME = /^\p{L}+(?:[ '\u2019\u02BC-]\p{L}*)*$/u;
   const REGEX_EMAIL = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+$/; // name@domain.tld
   const REGEX_PHONE = /^\+380\d{9}$/;                // +380 і рівно 9 цифр
   const MAX_MESSAGE = 1000;
