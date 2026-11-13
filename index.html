@@ -5,20 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- початковий масштаб сторінки (100%) -->
 <meta name="description" content="Nicole Frame — портретна та комерційна фотографія. Застигла естетика вашого моменту, прозорий калькулятор вартості та зручне бронювання.">
 <title>Nicole Frame — Портретна та комерційна фотографія</title>
-
-<!-- ============================================================
-     МЕДІАІНТЕГРАЦІЯ №1: ШРИФТИ ТА ІКОНКИ (зовнішні ресурси)
-     - Google Fonts: Playfair Display (заголовки) + Inter (основний текст)
-     - Font Awesome 6.6.0 (іконки в калькуляторі, футері) через cdnjs
-     ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-<!-- ===================== КІНЕЦЬ МЕДІАБЛОКУ №1 ===================== -->
+
 <script src="assets/js/validation.js" defer></script>
 <!-- Tailwind CSS через CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- CSS плагінів -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
 
 <script>
   tailwind.config = {
@@ -69,10 +66,6 @@
     --map-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 
-  /* ============================================================
-     МЕДІАІНТЕГРАЦІЯ: СТИЛІ ДЛЯ iframe-КОНТЕЙНЕРІВ (відео / карта)
-     Універсальний адаптивний контейнер (принцип DRY)
-     ============================================================ */
   .media-container {
     width: 100%;
     overflow: hidden;
@@ -88,7 +81,6 @@
   /* Відеоплеєр (працює на всіх розмірах екрана) */
   .video { max-width: var(--video-max-width); margin-inline: auto; width: 100%; }
   .video-caption { margin-top: 0.75rem; color: #6B5A55; }
-  /* ===================== КІНЕЦЬ СТИЛІВ МЕДІА ===================== */
 
   @layer base {
     /* На мобільних (до 600px) фіксуємо 16px, щоб не роздувало шрифти в rem */
@@ -168,6 +160,25 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     .footer-link { @apply opacity-85 transition-all duration-300 hover:pl-1 hover:text-primary hover:opacity-100; }
   }
 </style>
+<style>
+  /* Примусово розтягуємо контейнер слайда Fancybox v5 на весь екран */
+  .fancybox__container .fancybox__slide.has-image > .fancybox__content {
+    width: 85vw !important;
+    height: 82vh !important;
+    max-width: 85vw !important;
+    max-height: 82vh !important;
+    transform: none !important;
+  }
+
+  /* Саме зображення заповнює контейнер зі збереженням пропорцій */
+  .fancybox__container .fancybox__slide.has-image > .fancybox__content > img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: contain !important;
+  }
+</style>
 </head>
 <body>
 
@@ -225,7 +236,12 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     <div class="wrap relative">
       <div class="max-w-[68rem] py-6 md:py-12">
         <p class="mb-3 text-sm md:text-[1.15rem] font-medium uppercase tracking-[0.1em]">Портретна та комерційна фотографія</p>
-        <h1 id="hero-title" class="mb-4 text-2xl sm:text-4xl md:text-[clamp(3.95rem,5.6vw,5.75rem)] leading-tight md:leading-[1.08]">Мистецтво бачити важливе. Застигла естетика вашого моменту</h1>
+        <h1 id="hero-title" class="mb-4 grid text-2xl sm:text-4xl md:text-[clamp(3.95rem,5.6vw,5.75rem)] leading-tight md:leading-[1.08]">
+  <!-- Невидимий повний текст: резервує місце (сторінка не «стрибає») і читається скрінрідерами -->
+  <span class="invisible col-start-1 row-start-1">Мистецтво бачити важливе. Застигла естетика вашого моменту</span>
+  <!-- Сюди друкує Typed.js -->
+  <span id="typed-text" class="col-start-1 row-start-1" aria-hidden="true"></span>
+</h1>
         <p class="mb-8 max-w-[46rem] text-base md:text-[1.6rem] leading-relaxed md:leading-[1.55]">Nicole Frame — це простір, де фотографія домінує над зайвим шумом. Досконалий колір, глибока атмосфера та бездоганний сервіс від першого кліка.</p>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 md:gap-[3.95rem]">
           <a href="#calculator" class="btn btn-primary border-[3px] px-6 md:px-10 py-3 md:py-[1.1rem] text-base md:text-[1.4rem]">Розрахувати вартість</a>
@@ -272,42 +288,50 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
         <button type="button" class="tab px-4 md:px-6 py-2 md:py-[0.7rem] text-sm md:text-fs-md" aria-pressed="false">Комерція</button>
       </div>
 
-      <!-- ============================================================
-           МЕДІАІНТЕГРАЦІЯ: ГАЛЕРЕЯ ПОРТФОЛІО (6 зображень, lazy-завантаження,
-           співвідношення сторін 7:4, ефект збільшення при наведенні)
-           ============================================================ -->
-      <div class="mb-8 grid gap-x-5 gap-y-7 sm:grid-cols-2 md:grid-cols-3">
-        <article class="group flex cursor-pointer flex-col">
-          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-1.jpg" alt="Особиста історія" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
-          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Особиста історія</h3>
-          <p class="text-sm md:text-fs-md text-primary">Портрет</p>
-        </article>
-        <article class="group flex cursor-pointer flex-col">
-          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-2.jpg" alt="Разом вдома" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
-          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Разом вдома</h3>
-          <p class="text-sm md:text-fs-md text-primary">Родина</p>
-        </article>
-        <article class="group flex cursor-pointer flex-col">
-          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-3.jpg" alt="Прогулянка вдвох" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
-          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Прогулянка вдвох</h3>
-          <p class="text-sm md:text-fs-md text-primary">Історія кохання</p>
-        </article>
-        <article class="group flex cursor-pointer flex-col">
-          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-4.jpg" alt="Весільна зйомка" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
-          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">День, коли ви кажете «так»</h3>
-          <p class="text-sm md:text-fs-md text-primary">Весілля</p>
-        </article>
-        <article class="group flex cursor-pointer flex-col">
-          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-5.jpg" alt="Комерційна зйомка" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
-          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Люди за брендом</h3>
-          <p class="text-sm md:text-fs-md text-primary">Комерція</p>
-        </article>
-        <article class="group flex cursor-pointer flex-col">
-          <div class="mb-3 overflow-hidden rounded"><img src="assets/images/portfolio-6.jpg" alt="Портретна зйомка" loading="lazy" class="aspect-[7/4] w-full object-cover transition duration-500 group-hover:scale-105"></div>
-          <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Момент тільки для вас</h3>
-          <p class="text-sm md:text-fs-md text-primary">Портрет</p>
-        </article>
-      </div>
+     <div class="mb-8 grid gap-x-5 gap-y-7 sm:grid-cols-2 md:grid-cols-3">
+  <article class="group flex flex-col">
+    <a href="assets/images/portfolio-1.jpg" data-fancybox="portfolio-gallery" data-caption="Особиста історія · Портрет" class="mb-3 block overflow-hidden rounded">
+      <img src="assets/images/portfolio-1.jpg" alt="Особиста історія" loading="lazy" class="aspect-[7/4] w-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Особиста історія</h3>
+    <p class="text-sm md:text-fs-md text-primary">Портрет</p>
+  </article>
+  <article class="group flex flex-col">
+    <a href="assets/images/portfolio-2.jpg" data-fancybox="portfolio-gallery" data-caption="Разом вдома · Родина" class="mb-3 block overflow-hidden rounded">
+      <img src="assets/images/portfolio-2.jpg" alt="Разом вдома" loading="lazy" class="aspect-[7/4] w-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Разом вдома</h3>
+    <p class="text-sm md:text-fs-md text-primary">Родина</p>
+  </article>
+  <article class="group flex flex-col">
+    <a href="assets/images/portfolio-3.jpg" data-fancybox="portfolio-gallery" data-caption="Прогулянка вдвох · Історія кохання" class="mb-3 block overflow-hidden rounded">
+      <img src="assets/images/portfolio-3.jpg" alt="Прогулянка вдвох" loading="lazy" class="aspect-[7/4] w-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Прогулянка вдвох</h3>
+    <p class="text-sm md:text-fs-md text-primary">Історія кохання</p>
+  </article>
+  <article class="group flex flex-col">
+    <a href="assets/images/portfolio-4.jpg" data-fancybox="portfolio-gallery" data-caption="День, коли ви кажете «так» · Весілля" class="mb-3 block overflow-hidden rounded">
+      <img src="assets/images/portfolio-4.jpg" alt="Весільна зйомка" loading="lazy" class="aspect-[7/4] w-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">День, коли ви кажете «так»</h3>
+    <p class="text-sm md:text-fs-md text-primary">Весілля</p>
+  </article>
+  <article class="group flex flex-col">
+    <a href="assets/images/portfolio-5.jpg" data-fancybox="portfolio-gallery" data-caption="Люди за брендом · Комерція" class="mb-3 block overflow-hidden rounded">
+      <img src="assets/images/portfolio-5.jpg" alt="Комерційна зйомка" loading="lazy" class="aspect-[7/4] w-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Люди за брендом</h3>
+    <p class="text-sm md:text-fs-md text-primary">Комерція</p>
+  </article>
+  <article class="group flex flex-col">
+    <a href="assets/images/portfolio-6.jpg" data-fancybox="portfolio-gallery" data-caption="Момент тільки для вас · Портрет" class="mb-3 block overflow-hidden rounded">
+      <img src="assets/images/portfolio-6.jpg" alt="Портретна зйомка" loading="lazy" class="aspect-[7/4] w-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    <h3 class="mb-1 text-lg md:text-fs-2xl leading-[1.2] transition duration-300 group-hover:text-secondary">Момент тільки для вас</h3>
+    <p class="text-sm md:text-fs-md text-primary">Портрет</p>
+  </article>
+</div>
       <!-- ===================== КІНЕЦЬ ГАЛЕРЕЇ ПОРТФОЛІО ===================== -->
 
       <div class="flex justify-center"><a href="#" class="btn btn-primary">Переглянути всі роботи</a></div>
@@ -586,15 +610,7 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
       </div>
     </div>
   </section>
-
-  <!-- ============================================================
-       МЕДІАІНТЕГРАЦІЯ №2: ВІДЕО (YouTube, iframe)
-       - Адаптивне співвідношення сторін 16:9 (aspect-video)
-       - Відео вбудоване через youtube.com/embed (ID: gG142GTvqis)
-       - loading="lazy" — відкладене завантаження
-       - Доступність: title + aria-label, підпис <figcaption>
-       - Безпека: referrerpolicy="strict-origin-when-cross-origin"
-       ============================================================ -->
+ <!-- ВІДЕО -->
   <section class="py-8 md:py-12 bg-cream">
     <div class="mx-auto max-w-[var(--video-max-width)] px-4">
       <figure class="video mb-0">
@@ -619,58 +635,111 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
       </figure>
     </div>
   </section>
-  <!-- ===================== КІНЕЦЬ МЕДІАБЛОКУ №2 (ВІДЕО) ===================== -->
 
-  <!-- ВІДГУКИ -->
-  <section id="reviews" aria-labelledby="reviews-title" class="sec bg-surface-alt">
-    <div class="wrap">
-      <div class="mb-6 md:mb-[2.5rem]">
-        <h2 id="reviews-title" class="section-title">Відгуки клієнтів</h2>
-        <p class="section-desc pt-3">Щирі враження людей, з якими ми створили незабутні кадрові історії.</p>
-      </div>
-      <div class="mb-8 md:mb-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-        <!-- МЕДІА: аватари клієнтів (локальні файли assets/images/avatar-*.jpg) -->
-        <article class="flex flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8 shadow-sm">
-          <p class="text-xs md:text-fs-sm leading-relaxed opacity-85">«Планування було легким і зрозумілим, а м'яка підтримка на самій зйомці допомогла мені повністю розслабитися й почуватися впевнено перед камерою.»</p>
-          <div class="flex items-center gap-4">
-            <img src="assets/images/avatar-1.jpg" alt="Олена Коваль" class="size-10 md:size-12 rounded-full object-cover">
-            <div>
-              <p class="text-xs md:text-fs-sm font-semibold">Олена Коваль</p>
-              <p class="text-xs text-muted pt-2">Портретна зйомка</p>
+ <!-- ВІДГУКИ -->
+<section id="reviews" aria-labelledby="reviews-title" class="sec bg-surface-alt" style="--swiper-theme-color: #722138;">
+  <div class="wrap">
+    <div class="mb-6 md:mb-[2.5rem]">
+      <h2 id="reviews-title" class="section-title">Відгуки клієнтів</h2>
+      <p class="section-desc pt-3">Щирі враження людей, з якими ми створили незабутні кадрові історії.</p>
+    </div>
+
+    <!-- Слайдер -->
+    <div class="swiper reviews-swiper mb-8 md:mb-10">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide !h-auto">
+          <article class="flex h-full flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8">
+            <p class="text-sm md:text-fs-base leading-relaxed opacity-85">«Планування було легким і зрозумілим, а м'яка підтримка на самій зйомці допомогла мені повністю розслабитися й почуватися впевнено перед камерою.»</p>
+            <div class="flex items-center gap-4">
+              <img src="assets/images/avatar-1.jpg" alt="Олена Коваль" class="size-10 md:size-12 rounded-full object-cover">
+              <div>
+                <p class="text-xs md:text-fs-sm font-semibold">Олена Коваль</p>
+                <p class="text-xs text-muted pt-2">Портретна зйомка</p>
+              </div>
             </div>
-          </div>
-        </article>
-        <article class="flex flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8 shadow-sm">
-          <p class="text-xs md:text-fs-sm leading-relaxed opacity-85">«Ми хотіли спокійні, живі фото без награних поз. Сесія пройшла абсолютно невимушено й залишила простір для наших справжніх сімейних емоцій.»</p>
-          <div class="flex items-center gap-4">
-            <img src="assets/images/avatar-2.jpg" alt="Максим та Анна" class="size-10 md:size-12 rounded-full object-cover">
-            <div>
-              <p class="text-xs md:text-fs-sm font-semibold">Максим та Анна</p>
-              <p class="text-xs text-muted pt-2">Сімейна історія</p>
-            </div>
-          </div>
-        </article>
-        <article class="flex flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8 shadow-sm">
-          <p class="text-xs md:text-fs-sm leading-relaxed opacity-85">«Чіткий бриф, бездоганно продумана організація зйомки та естетичні кадри, які ідеально передають філософію нашого бренду.»</p>
-          <div class="flex items-center gap-4">
-            <img src="assets/images/avatar-3.jpg" alt="Максим Марченко" class="size-10 md:size-12 rounded-full object-cover">
-            <div>
-              <p class="text-xs md:text-fs-sm font-semibold">Максим Марченко</p>
-              <p class="text-xs text-muted pt-2">Комерційна зйомка</p>
-            </div>
-          </div>
-        </article>
-      </div>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-          <button type="button" class="icon-btn size-10 md:size-11 text-sm md:text-fs-base" aria-label="Попередній відгук">&larr;</button>
-          <span class="text-xs md:text-fs-sm font-semibold">01 / 03</span>
-          <button type="button" class="icon-btn size-10 md:size-11 text-sm md:text-fs-base" aria-label="Наступний відгук">&rarr;</button>
+          </article>
         </div>
-        <a href="#calculator" class="btn btn-primary w-full sm:w-auto">Забронювати зйомку</a>
+
+        <div class="swiper-slide !h-auto">
+          <article class="flex h-full flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8">
+            <p class="text-sm md:text-fs-base leading-relaxed opacity-85">«Ми хотіли спокійні, живі фото без награних поз. Сесія пройшла абсолютно невимушено й залишила простір для наших справжніх сімейних емоцій.»</p>
+            <div class="flex items-center gap-4">
+              <img src="assets/images/avatar-2.jpg" alt="Максим та Анна" class="size-10 md:size-12 rounded-full object-cover">
+              <div>
+                <p class="text-xs md:text-fs-sm font-semibold">Максим та Анна</p>
+                <p class="text-xs text-muted pt-2">Сімейна історія</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide !h-auto">
+          <article class="flex h-full flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8">
+            <p class="text-sm md:text-fs-base leading-relaxed opacity-85">«Чіткий бриф, бездоганно продумана організація зйомки та естетичні кадри, які ідеально передають філософію нашого бренду.»</p>
+            <div class="flex items-center gap-4">
+              <img src="assets/images/avatar-3.jpg" alt="Максим Марченко" class="size-10 md:size-12 rounded-full object-cover">
+              <div>
+                <p class="text-xs md:text-fs-sm font-semibold">Максим Марченко</p>
+                <p class="text-xs text-muted pt-2">Комерційна зйомка</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide !h-auto">
+          <article class="flex h-full flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8">
+            <p class="text-sm md:text-fs-base leading-relaxed opacity-85">«Весільний день пролетів, а фотографії дозволили прожити його знову. Ніколь була поруч непомітно, але зловила всі найщиріші емоції наших рідних.»</p>
+            <div class="flex items-center gap-4">
+              <img src="assets/images/avatar-1.jpg" alt="Софія Гнатюк" class="size-10 md:size-12 rounded-full object-cover">
+              <div>
+                <p class="text-xs md:text-fs-sm font-semibold">Софія Гнатюк</p>
+                <p class="text-xs text-muted pt-2">Весілля</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide !h-auto">
+          <article class="flex h-full flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8">
+            <p class="text-sm md:text-fs-base leading-relaxed opacity-85">«Прогулянка Львовом перетворилася на справжню історію про нас двох. Ми не вміємо позувати, але на фото виглядаємо природно й щасливо.»</p>
+            <div class="flex items-center gap-4">
+              <img src="assets/images/avatar-3.jpg" alt="Андрій Лисенко" class="size-10 md:size-12 rounded-full object-cover">
+              <div>
+                <p class="text-xs md:text-fs-sm font-semibold">Андрій Лисенко</p>
+                <p class="text-xs text-muted pt-2">Історія кохання</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide !h-auto">
+          <article class="flex h-full flex-col justify-between gap-6 border border-primary/15 bg-white p-6 md:p-8">
+            <p class="text-sm md:text-fs-base leading-relaxed opacity-85">«Фото для нашої команди були готові за два дні, як і обіцяли. Прозора ціна без сюрпризів і красивий авторський колір. Рекомендую всім, хто веде бізнес.»</p>
+            <div class="flex items-center gap-4">
+              <img src="assets/images/avatar-3.jpg" alt="Тарас Шевчук" class="size-10 md:size-12 rounded-full object-cover">
+              <div>
+                <p class="text-xs md:text-fs-sm font-semibold">Тарас Шевчук</p>
+                <p class="text-xs text-muted pt-2">Комерційна зйомка</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
       </div>
     </div>
-  </section>
+
+    <!-- Керування: стрілка · крапки · стрілка + кнопка -->
+    <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+      <div class="flex items-center gap-4">
+        <button type="button" class="reviews-prev icon-btn size-10 md:size-11 text-sm md:text-fs-base" aria-label="Попередній відгук">&larr;</button>
+        <div class="reviews-pagination !static !flex !w-auto items-center"></div>
+        <button type="button" class="reviews-next icon-btn size-10 md:size-11 text-sm md:text-fs-base" aria-label="Наступний відгук">&rarr;</button>
+      </div>
+      <a href="#calculator" class="btn btn-primary w-full sm:w-auto">Забронювати зйомку</a>
+    </div>
+  </div>
+</section>
 
   <!-- ФІНАЛЬНИЙ CTA -->
   <section aria-labelledby="cta-title" class="border-b border-primary py-12 md:py-24 text-center bg-cream">
@@ -684,14 +753,7 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     </div>
   </section>
 
-  <!-- ============================================================
-       МЕДІАІНТЕГРАЦІЯ №3: ІНТЕРАКТИВНА КАРТА (Google Maps, iframe)
-       - Адреса студії: вул. Під Голоском, 20, Львів
-       - Співвідношення сторін: 4:3 на мобільних, 16:9 на ПК
-       - loading="lazy" — відкладене завантаження
-       - Доступність: title + aria-label
-       - Приватність: referrerpolicy="no-referrer-when-downgrade"
-       ============================================================ -->
+  <!-- КАРТА-->
   <section id="contacts" class="py-8 md:py-12 bg-cream">
     <div class="mx-auto max-w-[var(--map-max-width)] px-4">
 
@@ -719,7 +781,6 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
 
     </div>
   </section>
-  <!-- ===================== КІНЕЦЬ МЕДІАБЛОКУ №3 (КАРТА) ===================== -->
 
 </main>
 
@@ -769,6 +830,51 @@ textarea.field[data-state="valid"] { background-position: right 1rem top 1rem; }
     </div>
   </div>
 </footer>
+<!-- JS плагінів -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // 1. Swiper: відгуки (3 слайди, крапки + стрілки)
+        new Swiper('.reviews-swiper', {
+      loop: true,
+      spaceBetween: 24,
+      autoplay: { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true },
+      pagination: { el: '.reviews-pagination', clickable: true },
+      navigation: { nextEl: '.reviews-next', prevEl: '.reviews-prev' },
+      breakpoints: {
+        0: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 },
+      },
+    });
+   
+
+
+// 2. Fancybox: портфоліо
+Fancybox.bind('[data-fancybox="portfolio-gallery"]', {
+  Carousel: {
+    transition: 'fade',
+  },
+  Images: {
+    initialSize: 'fit',
+    Panzoom: {
+      maxScale: 3,
+    },
+  },
+});
+
+
+    // 3. Typed.js: заголовок Hero
+    new Typed('#typed-text', {
+      strings: ['Мистецтво бачити важливе. Застигла естетика вашого моменту'],
+      typeSpeed: 50,
+      showCursor: false,
+      loop: false,
+    });
+  });
+</script>
 </body>
 </html>
